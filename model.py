@@ -246,11 +246,11 @@ class ResNet(nn.Module):
         self.stage5 = stage5
 
         self.C1 = nn.Sequential(
-            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),
+            nn.Conv2d(3, 64, kernel_size=7, stride=2, padding=3),  # 宽高减半
             nn.BatchNorm2d(64, eps=0.001, momentum=0.01),
             nn.ReLU(inplace=True),
             SamePad2d(kernel_size=3, stride=2),
-            nn.MaxPool2d(kernel_size=3, stride=2),
+            nn.MaxPool2d(kernel_size=3, stride=2),  # 分辨率不变
         )
         self.C2 = self.make_layer(self.block, 64, self.layers[0])
         self.C3 = self.make_layer(self.block, 128, self.layers[1], stride=2)
@@ -441,7 +441,7 @@ def pyramid_roi_align(inputs, pool_size, image_shape):
     image_area = Variable(torch.FloatTensor([float(image_shape[0]*image_shape[1])]), requires_grad=False)
     if boxes.is_cuda:
         image_area = image_area.cuda()
-    roi_level = 4 + log2(torch.sqrt(h*w)/(224.0/torch.sqrt(image_area)))
+    roi_level = 4 + log2(torch.sqrt(h*w)/(224.0/torch.sqrt(image_area)))  # 不同的特征图负责不同尺度的框
     roi_level = roi_level.round().int()
     roi_level = roi_level.clamp(2,5)
 
@@ -479,7 +479,7 @@ def pyramid_roi_align(inputs, pool_size, image_shape):
         pooled.append(pooled_features)
 
     # Pack pooled features into one tensor
-    pooled = torch.cat(pooled, dim=0)
+    pooled = torch.cat(pooled, dim=0)  # 每个特征层的通道数相同
 
     # Pack box_to_level mapping into one array and add another
     # column representing the order of pooled boxes
@@ -861,7 +861,7 @@ class RPN(nn.Module):
                   applied to anchors.
     """
 
-    def __init__(self, anchors_per_location, anchor_stride, depth):
+    def __init__(self, anchors_per_location, anchor_stride, depth): # 3 1 256
         super(RPN, self).__init__()
         self.anchors_per_location = anchors_per_location
         self.anchor_stride = anchor_stride

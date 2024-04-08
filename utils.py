@@ -449,9 +449,9 @@ def generate_pyramid_anchors(scales, ratios, feature_shapes, feature_strides,
     """
     # Anchors
     # [anchor_count, (y1, x1, y2, x2)]
-    anchors = []
+    anchors = []  # 在原图上生成的anchor
     for i in range(len(scales)):
-        anchors.append(generate_anchors(scales[i], ratios, feature_shapes[i],
+        anchors.append(generate_anchors(scales[i], ratios, feature_shapes[i], # 每个特征图生成的anchor尺度不同
                                         feature_strides[i], anchor_stride))
     return np.concatenate(anchors, axis=0)
 
